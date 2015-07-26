@@ -22,7 +22,8 @@
       scope: {
         mainVideo: '@',
         hiddenVideo: '@',
-        autoplay: '@'
+        autoplay: '@',
+        key: '@'
       },
       template: ['<div id="topVideo"></div>','<div id="hiddenVideo"></div>'].join(''),
       link: link
@@ -36,7 +37,7 @@
       config.videos.push({ id: 'hiddenVideo', youtubeId: scope.hiddenVideo});
       config.count = config.videos.length;
       config.autoPlay = (Boolean(scope.autoplay)) ? true : false;
-      config.key = scope.key || 82;
+      config.key = parseInt(scope.key) || 82;
 
       if (config.videos.length !== 2) {
         return;
