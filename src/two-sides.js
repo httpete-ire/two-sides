@@ -24,7 +24,7 @@
         hiddenVideo: '@',
         autoplay: '@'
       },
-      template: ['<div id="topVideo"></div>', '<div id="hiddenVideo"></div>'].join(''),
+      template: ['<div id="topVideo"></div>','<div id="hiddenVideo"></div>'].join(''),
       link: link
     };
 
@@ -36,20 +36,26 @@
       config.videos.push({ id: 'hiddenVideo', youtubeId: scope.hiddenVideo});
       config.count = config.videos.length;
       config.autoPlay = (Boolean(scope.autoplay)) ? true : false;
+      config.key = scope.key || 82;
 
       if (config.videos.length !== 2) {
         return;
       }
 
+      var hiddenVideo = elem[0].querySelector('#hiddenVideo');
+      var topVideo = elem[0].querySelector('#topVideo');
+
       YoutubeAPI.loadAPi();
+
+      switchVideos(topVideo, hiddenVideo);
 
       $window.onYouTubeIframeAPIReady = function() {
 
         angular.forEach(config.videos, function(video) {
 
           video.player = new YT.Player(video.id, {
-            height: '390',
-            width: '640',
+            height: '100%',
+            width: '100%',
             videoId: video.youtubeId,
             playerVars : {
               'autoplay': '0',
@@ -87,38 +93,78 @@
             playVideos();
           }
 
+          // add event listerners
+
+          angular.element($window).on('keyup', handlePress);
+          angular.element($window).on('keydown', handlePress);
+
+          hiddenVideo = elem[0].querySelector('#hiddenVideo');
+          topVideo = elem[0].querySelector('#topVideo');
+
         }
       }
 
-      function muteVideo(player) {
-        player.mute();
-      }
+      function handlePress(e) {
+        var key = e.which || e.keyCode;
 
-      function unmuteVideo(player) {
-        player.unMute();
+        if(key === config.key) {
+
+          var showVideo;
+          var hideVideo;
+          var mute;
+          var unmute;
+
+          if(e.type === 'keyup') {
+            showVideo = topVideo;
+            hideVideo = hiddenVideo;
+            mute = config.videos[1].player;
+            unmute = config.videos[0].player;
+          } else {
+            showVideo = hiddenVideo;
+            hideVideo = topVideo;
+            mute = config.videos[0].player;
+            unmute = config.videos[1].player;
+          }
+
+          switchVideos(showVideo, hideVideo);
+          muteVideo(mute);
+          unmuteVideo(unmute);
+        }
       }
 
       function playVideos() {
-        angular.forEach(config.videos, function(video) {
-          video.player.playVideo();
-        });
+        _callOnAllVideos('playVideo');
       }
 
       function pauseVideos() {
-        angular.forEach(config.videos, function(video) {
-          video.player.pauseVideo();
-        });
+        _callOnAllVideos('pauseVideo');
+
       }
 
       function stopVideos() {
+        _callOnAllVideos('stopVideo');
+      }
+
+      function _callOnAllVideos(fn) {
         angular.forEach(config.videos, function(video) {
-          video.player.stopVideo();
+          video.player[fn]();
         });
       }
 
     } // /link
 
+    function muteVideo(player) {
+      player.mute();
+    }
 
+    function unmuteVideo(player) {
+      player.unMute();
+    }
+
+    function switchVideos(showVideo, hideVideo) {
+      showVideo.style.display = "block";
+      hideVideo.style.display = "none";
+    }
 
   }
 
@@ -139,7 +185,7 @@
       }
 
       var tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
+      tag.src = "http://www.youtube.com/iframe_api";
 
       var firstScript = document.getElementsByTagName('script')[0];
       firstScript.parentNode.insertBefore(tag, firstScript);
