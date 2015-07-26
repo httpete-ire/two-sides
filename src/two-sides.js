@@ -34,8 +34,8 @@
       config.videos = [];
       config.videos.push({ id: 'topVideo', youtubeId: scope.mainVideo});
       config.videos.push({ id: 'hiddenVideo', youtubeId: scope.hiddenVideo});
-
-      config.autoPlay = (Boolean(scope.autoplay)) ? '1' : '0';
+      config.count = config.videos.length;
+      config.autoPlay = (Boolean(scope.autoplay)) ? true : false;
 
       if (config.videos.length !== 2) {
         return;
@@ -52,11 +52,15 @@
             width: '640',
             videoId: video.youtubeId,
             playerVars : {
-              'autoplay': 0,
+              'autoplay': '0',
               'controls': '0',
               'modestbranding': '1',
               'rel': '0',
               'showinfo': '0'
+            },
+            events: {
+              'onReady' : videosReady,
+              'onStateChange' : onPlayerStateChange
             }
           });
 
@@ -64,7 +68,56 @@
 
       }
 
+      function onPlayerStateChange (e) {
+        if (e.data === YT.PlayerState.PLAYING) {
+          playVideos();
+        } else if (e.data === YT.PlayerState.PAUSED) {
+          pauseVideos();
+        }
+      }
+
+      function videosReady() {
+        config.count--;
+
+        if (config.count === 0) {
+
+          muteVideo(config.videos[1].player);
+
+          if (config.autoPlay) {
+            playVideos();
+          }
+
+        }
+      }
+
+      function muteVideo(player) {
+        player.mute();
+      }
+
+      function unmuteVideo(player) {
+        player.unMute();
+      }
+
+      function playVideos() {
+        angular.forEach(config.videos, function(video) {
+          video.player.playVideo();
+        });
+      }
+
+      function pauseVideos() {
+        angular.forEach(config.videos, function(video) {
+          video.player.pauseVideo();
+        });
+      }
+
+      function stopVideos() {
+        angular.forEach(config.videos, function(video) {
+          video.player.stopVideo();
+        });
+      }
+
     } // /link
+
 
 
   }
