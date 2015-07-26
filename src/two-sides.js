@@ -93,11 +93,10 @@
             playVideos();
           }
 
-          // add event listerners
-
           angular.element($window).on('keyup', handlePress);
           angular.element($window).on('keydown', handlePress);
 
+          // get the iframes
           hiddenVideo = elem[0].querySelector('#hiddenVideo');
           topVideo = elem[0].querySelector('#topVideo');
 

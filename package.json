@@ -1,7 +1,7 @@
 {
   "name": "revealer",
   "version": "0.0.1",
-  "description": "An Angular directive that overlays an image on another",
+  "description": "An Angular directive that overlays two youtube videos, when a certain key is pressed it will show the hidden video",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
