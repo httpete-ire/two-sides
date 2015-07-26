@@ -16,20 +16,26 @@
    */
   function twoSides(YoutubeAPI, $window) {
 
+    var uniqueId = 1;
+
     return {
       scope: {
         mainVideo: '@',
-        hiddenVideo: '@'
+        hiddenVideo: '@',
+        autoplay: '@'
       },
-      template: '<h1>Hello world</h1>',
+      template: ['<div id="topVideo"></div>', '<div id="hiddenVideo"></div>'].join(''),
       link: link
     };
 
     function link (scope, elem, attrs) {
 
       var config = {};
-      config.videos = [scope.mainVideo, scope.hiddenVideo];
-      config.autoPlay = (Boolean(scope.autoPlay)) ? 1 : 0;
+      config.videos = [];
+      config.videos.push({ id: 'topVideo', youtubeId: scope.mainVideo});
+      config.videos.push({ id: 'hiddenVideo', youtubeId: scope.hiddenVideo});
+
+      config.autoPlay = (Boolean(scope.autoplay)) ? '1' : '0';
 
       if (config.videos.length !== 2) {
         return;
@@ -39,9 +45,26 @@
 
       $window.onYouTubeIframeAPIReady = function() {
 
+        angular.forEach(config.videos, function(video) {
+
+          video.player = new YT.Player(video.id, {
+            height: '390',
+            width: '640',
+            videoId: video.youtubeId,
+            playerVars : {
+              'autoplay': 0,
+              'controls': '0',
+              'modestbranding': '1',
+              'rel': '0',
+              'showinfo': '0'
+            }
+          });
+
+        });
+
       }
 
-    };
+    } // /link
 
 
   }
